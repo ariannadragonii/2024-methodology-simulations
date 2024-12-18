@@ -1,3 +1,4 @@
+import os
 from scenarios import * 
 from methodology import methodology
 from aux_simulation import create_graph
@@ -26,6 +27,7 @@ def stress_multi_data_flow(number_of_nodes, number_of_data_flows, number_of_simu
     avg_time = sum(times) / len(times)
     return avg_time
 
+
 # Verify the performances for a single data flow scenario when number of nodes increases
 def complexity_single_data_flow(nodes_range, max_num_of_nodes, num_of_simulations):
     timestamp = datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
@@ -33,14 +35,23 @@ def complexity_single_data_flow(nodes_range, max_num_of_nodes, num_of_simulation
     avg_times = []
     n_nodes_list = []
 
-    for num_of_nodes in range(nodes_range, max_num_of_nodes + num_of_simulations, nodes_range):
-        if num_of_nodes != 1: 
-            n_nodes_list.append(num_of_nodes/10)
-            avg_time = stress_single_data_flow(num_of_nodes, num_of_simulations)
-            avg_times.append(avg_time)
+    folder_path = 'single_data_flow_simulations'
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
-    graph_folder = 'single_data_flow_simulations'
-    create_graph(simulation_name, graph_folder, 'Tens of number of nodes', n_nodes_list, 'Exec time [s]', avg_times)
+    with open(os.path.join(folder_path, f'{simulation_name}_data.txt'), 'w') as f:
+        f.write("tens_num_of_nodes,avg_time\n")
+        
+        for num_of_nodes in range(nodes_range, max_num_of_nodes + num_of_simulations, nodes_range):
+            if num_of_nodes != 1: 
+                n_nodes_list.append(num_of_nodes)
+                avg_time = stress_single_data_flow(num_of_nodes, num_of_simulations)
+                avg_times.append(avg_time)
+                f.write(f"{num_of_nodes},{avg_time}\n")
+
+    graph_folder = 'single_data_flow_graphs'
+    create_graph(simulation_name, graph_folder, 'Number of number of nodes', n_nodes_list, 'Exec time [s]', avg_times)
+
 
 # Verify performances when the number of data flows in a scenario with fixed number of nodes increases
 def complexity_multi_data_flow(data_flows_range, max_num_of_data_flows, num_of_nodes, num_of_simulations):
@@ -49,13 +60,20 @@ def complexity_multi_data_flow(data_flows_range, max_num_of_data_flows, num_of_n
     avg_times = []
     n_data_flows_list = []
 
-    for num_of_data_flows in range(data_flows_range, max_num_of_data_flows + data_flows_range, data_flows_range):
-        if (num_of_nodes > num_of_data_flows + 1):
-            n_data_flows_list.append(num_of_data_flows)
-            avg_time = stress_multi_data_flow(num_of_nodes, num_of_data_flows, num_of_simulations)
-            avg_times.append(avg_time)
+    folder_path = 'multi_data_flow_simulations'
+    if not os.path.exists(folder_path):
+        os.makedirs(folder_path)
 
-    graph_folder = 'multi_data_flow_simulations'
+    with open(os.path.join(folder_path, f'{simulation_name}_data.txt'), 'w') as f:
+        f.write("num_of_data_flows,avg_time\n")
+
+        for num_of_data_flows in range(data_flows_range, max_num_of_data_flows + data_flows_range, data_flows_range):
+            if (num_of_nodes > num_of_data_flows + 1):
+                n_data_flows_list.append(num_of_data_flows)
+                avg_time = stress_multi_data_flow(num_of_nodes, num_of_data_flows, num_of_simulations)
+                avg_times.append(avg_time)
+                f.write(f"{num_of_data_flows},{avg_time}\n")
+
+    graph_folder = 'multi_data_flow_graphs'
     create_graph(simulation_name, graph_folder,'Number of data flows', n_data_flows_list, 'Exec time [s]', avg_times)
-
 

@@ -1,6 +1,7 @@
 import sys
 
 from aux_log import create_log, print_log
+from aux_graph import produce_graph
 from methodology import methodology
 from methodology_performances import complexity_single_data_flow, complexity_multi_data_flow
 from scenarios import *
@@ -59,10 +60,25 @@ def main():
     
     elif function_name == 'analyze_complexity_multi_data_flow':
         if len(args) != 4:
-            print("Usage main.py analize_complexity_multi_data_flow data_flows_range max_num_of_data_flows num_of_nodes num_of_simulations ")
+            print("Usage main.py analyze_complexity_multi_data_flow data_flows_range max_num_of_data_flows num_of_nodes num_of_simulations ")
             sys.exit(1)
         args = list(map(int, args))
         analize_complexity_multi_data_flow(*args)
+    
+    elif function_name == 'plot_single_data_flow':
+        produce_graph('single_data_flow_simulations/single_50_600_3_2024-12-18_15-20-53_data.txt', 
+                      'single_plot_0', 
+                      'single_data_flow_graphs', 
+                      'Number of nodes', 
+                      'Exec time [s]' )
+    
+    elif function_name == 'plot_multi_data_flows':
+        produce_graph('multi_data_flow_simulations/multi_10_50_300_3_2024-12-18_15-20-16_data.txt',
+                      'multi_plot_0',
+                      'multi_data_flow_graphs',
+                      'Number of data flows',
+                      'Exec time [s]'
+                      )
 
     else:
         print("Invalid function.")
